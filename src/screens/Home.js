@@ -17,7 +17,7 @@ import NfcManager, {
 } from 'react-native-nfc-manager';
 
 export default function Home({navigation, route}) {
-  const [loading, setLoading] = React.useState('Scannig...');
+  const [loading, setLoading] = React.useState('Waiting for NFC...');
   const [visible, setVisible] = React.useState(false);
 
   const readTag = async () => {
@@ -29,26 +29,28 @@ export default function Home({navigation, route}) {
       tag = await NfcManager.getTag();
       tag.ndefStatus = await NfcManager.ndefHandler.getNdefStatus();
 
-      setLoading(' complete');
+      setLoading('Complete');
     } catch (ex) {
       // for tag reading, we don't actually need to show any error
       console.log(ex);
     } finally {
       NfcManager.cancelTechnologyRequest();
-      setTimeout(() => {
-        setVisible(false);
-        setLoading('Scannig...');
-        navigation.navigate('TagDetail', {tag});
-      }, 2000);
+      if (tag) {
+        setTimeout(() => {
+          setVisible(false);
+          setLoading('Waiting for NFC...');
+          navigation.navigate('TagDetail', {tag});
+        }, 2000);
+      }
     }
 
     return tag;
   };
 
   function cancelNfcScan() {
-    setTimeout(() => {
+    {
       NfcManager.cancelTechnologyRequest().catch(() => 0);
-    }, 200);
+    }
     setVisible(false);
   }
 
@@ -65,21 +67,29 @@ export default function Home({navigation, route}) {
         }>
         <Text style={{color: 'white'}}>Read</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={{backgroundColor: 'blue', padding: 10}}
+        onPress={() => navigation.navigate('NdefWrite')}>
+        <Text style={{color: 'white'}}>Write</Text>
+      </TouchableOpacity>
       {/* -------------------------------------- */}
-      <View style={styles.centeredView}>
-        <Modal animationType="slide" transparent={true} visible={visible}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>{loading}</Text>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => cancelNfcScan()}>
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-            </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        style={styles.centeredView}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{loading}</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => cancelNfcScan()}>
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -87,6 +97,7 @@ export default function Home({navigation, route}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -94,12 +105,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
-    margin: 20,
+    marginBottom: 10,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 10,
+    width: '90%',
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
@@ -113,8 +124,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 20,
-    padding: 10,
-    elevation: 2,
+    padding: 13,
   },
   buttonOpen: {
     backgroundColor: '#F194FF',

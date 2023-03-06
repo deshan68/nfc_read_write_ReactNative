@@ -5,6 +5,7 @@ import Home from './screens/Home';
 import TagDetailScreen from './screens/TagDetailScreen';
 import NfcPromptAndroid from './components/NfcPromptAndroid';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import NdefWriteScreen from './screens/NdefWriteScreen';
 
 const MainStack = createNativeStackNavigator();
 
@@ -26,13 +27,13 @@ function Main(props) {
         name="NdefTypeList"
         component={NdefTypeListScreen} // write option list screen
         options={{title: 'CHOOSE NDEF TYPE'}}
-      />
+      /> */}
       <MainStack.Screen
         name="NdefWrite"
         component={NdefWriteScreen} // wtrting functions
         options={{title: 'WRITE NDEF'}}
       />
-      <MainStack.Screen
+      {/* <MainStack.Screen
         name="ToolKit"
         component={ToolKitScreen} // tool kit screen
         options={{title: 'NFC TOOL KIT'}}
